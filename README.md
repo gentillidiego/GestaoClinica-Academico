@@ -11,6 +11,8 @@ A stack atual roda com:
 - **gestaoclinica-redis (Redis 7)** - Broker de mensagens em background e backend do limitador de taxa (*Rate Limiting*).
 - **gestaoclinica-celery (Celery Worker)** - Fila de processos responsável pela geração super pesada de PDFs (Receitas/Atestados) em segundo plano usando a biblioteca nativa `WeasyPrint`.
 
+> **Repositório oficial:** o código-fonte versionado está em `git@github.com:gentillidiego/GestaoClinica-Academico.git`, branch principal `main`.
+
 > **Fonte de dados ativa:** PostgreSQL é o banco oficial da aplicação. Arquivos `clinica.db` existentes no repositório são legado/backup da migração e não devem ser montados pelos contêineres web ou worker.
 
 > **Variáveis obrigatórias:** configure `.env` com `SECRET_KEY`, `DATABASE_URL`, `REDIS_URL` e `POSTGRES_PASSWORD`. Para uma checagem rápida do ambiente, execute `python scripts/check_env.py`.
@@ -27,6 +29,12 @@ A stack atual roda com:
 2. **Acoplamento do Celery - Configuração Final PDF:**
    - Detectamos e corrigimos ausências de tarefas durante as conexões em tempo real - a inicialização foi obrigatoriamente forçada dentro de `celery_app.py` com o vínculo `include=['tasks.pdf_tasks']`, ensinando o operário central Python as rotinas disponíveis para geração.
    - Havia silos estáticos isolados: A Aplicação Flask não conseguia achar o PDF que o Trabalhador enviou como pronto, pois não enxergavam a mesma pasta real da máquina. Passamos então a conectar inteligentemente os diretórios sob a tag global Docker *Volume* (`pdf_temp:/app/pdf_temp`) entre o Web App e o serviço Celery. Agora os relatórios aparecem num estalar de dedos de forma perfeita com acesso livre compartilhado.
+
+3. **Higiene de Deploy, Git e Segurança Operacional:**
+   - O projeto foi inicializado no Git e publicado no GitHub sem arquivos sensíveis ou gerados: `.env`, bancos locais, backups, logs, `.venv`, PDFs temporários, cookies, dumps e resultados de carga ficam bloqueados por `.gitignore` e `.dockerignore`.
+   - O `create_admin.py` não possui mais usuário/senha hardcoded; use `ADMIN_USERNAME` e `ADMIN_PASSWORD` no ambiente quando precisar criar o administrador inicial.
+   - O `celery-worker` agora inicializa por `scripts/start_celery.sh`, prepara `pdf_temp`, configura cache gravável para fontes e executa o Celery como `appuser`, evitando worker privilegiado como `root`.
+   - `docker-compose.yml` possui healthchecks para Redis/PostgreSQL e removeu os mounts legados de `clinica.db` nos serviços web/worker.
 
 ## 🦸 Instruções Ouro para Desenvolvedores e IAs (Agente Antigravity / Eng. de Sistema)
 
@@ -51,3 +59,16 @@ Você, como próximo dev, mantenedor ou IA, deve assumir este repositório aplic
 
 4. **Escalando o Stress na Carga (Rate Limits 429):**
    Este aplicativo obedece métricas rígidas de estrangulamento de tentativas e injeção (Graças ao `Flask-Limiter` vinculado ao BD Redis). Operações com Locust ou artilharias de bot (Ex: Testes Assíncronos `simulando 100 usuários efetuando login de uma vez`) irão engasgar rapidamente com status `HTTP 429`. Afrouxe ou remova os limites estritamente dentro de `.env` ou do código de `auth.py` caso procure conduzir Testes de Escalabilidade controlados, lembrando categoricamente de devolvê-los assim que os dados analíticos terminarem seu ciclo!
+
+5. **Atualização Obrigatória de Documentação e Git Quando Couber:**
+   Ao finalizar uma alteração, avalie se ela muda arquitetura, deploy, variáveis de ambiente, comandos operacionais, segurança, persistência de dados, fluxos de PDF/Celery, banco de dados, permissões, rotas importantes ou comportamento visível para usuários. Se mudar, atualize este `README.md` e/ou `docs/system_architecture_and_rules.md` no mesmo ciclo.
+
+   Quando a mudança estiver validada, registre no Git de forma explícita:
+   ```bash
+   git status
+   git add <arquivos-alterados>
+   git commit -m "Descrição curta da mudança"
+   git push
+   ```
+
+   Não é necessário atualizar README/docs para correções internas triviais que não alterem uso, deploy, arquitetura ou operação. Ainda assim, toda alteração útil e validada deve ser versionada no Git quando o repositório estiver disponível.
