@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Termo de Consentimento - {{ patient.nome }}{% endblock %}
+
+{% block content %}
+<div class="animate-fade"
+    style="max-width: 900px; margin: 2rem auto; padding: 3rem; background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid hsl(var(--border));">
+
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h2
+            style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: hsl(var(--primary)); text-transform: uppercase; margin-bottom: 0.5rem;">
+            TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO</h2>
+        <p style="color: hsl(var(--text-muted)); font-weight: 600;">CENTRO UNIVERSITÁRIO MARIO PONTES - FAPEC</p>
+    </div>
+
+    <form method="POST" id="tcle-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="assinatura_base64" id="assinatura_base64">
+
+        <div
+            style="line-height: 1.8; color: hsl(var(--text-main)); font-size: 1.1rem; text-align: justify; margin-bottom: 3rem;">
+            <p>
+                Declaro que o (a) aluno do curso de odontologia da Faculdade de Tecnologia de Alagoas
+                <strong style="border-bottom: 1px solid hsl(var(--border)); padding: 0 10px;">{{
+                    current_user.full_name or current_user.username|capitalize }}</strong>
+                esclareceu-me adequadamente os propósitos, riscos, custos e alternativas de tratamento, bem como que o
+                sucesso do tratamento dependerá da resposta biológica do meu organismo à técnica empregada e de minha
+                colaboração, atendimento às prescrições, encaminhamentos e demais solicitações do profissional.
+            </p>
+            <p>
+                Declaro, ainda, que estou ciente que eventuais ausências às consultas e o não atendimento das
+                orientações profissionais prejudicarão o resultado pretendido, uma vez que a Odontologia não se trata de
+                uma ciência exata, sofrendo limitações.
+            </p>
+            <p>
+                Informo que, estou ciente de que, no curso do tratamento, dependendo da resposta biológica, poderá haver
+                a necessidade de alteração do plano de tratamento, da técnica empregada, que e da previsão orçamentária.
+            </p>
+            <p>
+                Por fim, aceito e autorizo a execução do tratamento comprometendo-me a cumprir as orientações do
+                profissional e arcando com os custos estipulados no orçamento apresentado.
+            </p>
+        </div>
+
+        <div style="margin-bottom: 3rem; font-weight: 600;">
+            Maceió, <span id="current-day"></span> de <span id="current-month"></span> de <span
+                id="current-year"></span>
+        </div>
+
+        <div style="display: grid; gap: 2rem; margin-bottom: 3rem;">
+            <div class="signature-section">
+                <label
+                    style="display: block; font-weight: 700; color: hsl(var(--primary)); margin-bottom: 1rem; text-transform: uppercase; font-size: 0.85rem;">Assinatura
+                    do Paciente (ou Responsável)</label>
+                <div class="signature-container"
+                    style="border: 2px dashed hsl(var(--border)); border-radius: var(--radius-md); background: hsl(var(--bg-main)/0.3); padding: 10px; position: relative;">
+                    <canvas id="signature-pad"
+                        style="width: 100%; height: 200px; touch-action: none; background: white;"></canvas>
+                    <button type="button" id="clear-signature"
+                        style="position: absolute; top: 10px; right: 10px; padding: 0.5rem 1rem; font-size: 0.75rem; background: hsl(var(--bg-main)); border: 1px solid hsl(var(--border)); border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; color: hsl(var(--text-muted));">LIMPAR
+                        🔄</button>
+                </div>
+                <p style="font-size: 0.85rem; color: hsl(var(--text-muted)); margin-top: 0.5rem; text-align: center;">
+                    Clique e arraste acima para assinar digitalmente</p>
+            </div>
+
+            <div style="padding-top: 1rem; border-top: 1px solid hsl(var(--border));">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div style="text-align: center; flex: 1;">
+                        <div
+                            style="height: 1px; background: hsl(var(--text-main)); margin-bottom: 0.5rem; width: 80%; margin-left: auto; margin-right: auto;">
+                        </div>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: hsl(var(--text-muted));">Assinatura do
+                            Aluno: {{ current_user.full_name or current_user.username|capitalize }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1.5rem; justify-content: flex-end; margin-top: 2rem;">
+            <a href="{{ url_for('patients.view_patient', id=patient.id) }}" class="btn btn-outline"
+                style="padding: 1rem 2rem;">CANCELAR</a>
+            <button type="submit" class="btn btn-primary"
+                style="padding: 1rem 3rem; font-weight: 800; font-size: 1.1rem; letter-spacing: 0.05em;">💾 SALVAR E
+                CONFIRMAR TERMO</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const canvas = document.getElementById('signature-pad');
+        const signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgb(255, 255, 255)'
+        });
+
+        const clearButton = document.getElementById('clear-signature');
+        const form = document.getElementById('tcle-form');
+        const hiddenInput = document.getElementById('assinatura_base64');
+
+        // Preencher data
+        const date = new Date();
+        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        document.getElementById('current-day').textContent = date.getDate();
+        document.getElementById('current-month').textContent = months[date.getMonth()];
+        document.getElementById('current-year').textContent = date.getFullYear();
+
+        clearButton.addEventListener('click', function () {
+            signaturePad.clear();
+        });
+
+        form.addEventListener('submit', function (e) {
+            if (signaturePad.isEmpty()) {
+                alert('A assinatura do paciente é obrigatória para prosseguir.');
+                e.preventDefault();
+                return;
+            }
+            hiddenInput.value = signaturePad.toDataURL();
+        });
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const parent = canvas.parentElement;
+            canvas.width = parent.offsetWidth - 24; // compensar padding
+            canvas.height = 200;
+            const context = canvas.getContext("2d");
+            context.scale(1, 1); // Simples para esse caso
+            signaturePad.clear();
+        }
+
+        window.onresize = resizeCanvas;
+        resizeCanvas();
+    });
+</script>
+{% endblock %}

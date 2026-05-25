@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Gestão Clínica{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div style="margin-bottom: 3rem;">
+        <h1 class="page-title">Bem-vindo, {{ user.full_name or user.username }}! 👋</h1>
+        <p class="page-subtitle">Aqui está um resumo do que acontece hoje na clínica.</p>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stat-grid" style="margin-bottom: 2.5rem;">
+        <div class="stat-card" style="border-bottom: 4px solid hsl(var(--primary));">
+            <div class="stat-icon" style="background: hsl(var(--primary-soft));">👥</div>
+            <div class="stat-info">
+                <span class="stat-value" style="font-size: 1.75rem;">{{ stats.total_patients }}</span>
+                <span class="stat-label">Total de Pacientes</span>
+            </div>
+        </div>
+        <div class="stat-card" style="border-bottom: 4px solid hsl(var(--success));">
+            <div class="stat-icon" style="background: hsl(var(--success) / 0.15);">📅</div>
+            <div class="stat-info">
+                <span class="stat-value" style="font-size: 1.75rem;">{{ stats.patients_month }}</span>
+                <span class="stat-label">Pacientes Este Mês</span>
+            </div>
+        </div>
+        <div class="stat-card" style="border-bottom: 4px solid hsl(var(--warning));">
+            <div class="stat-icon" style="background: hsl(var(--warning) / 0.15);">🩺</div>
+            <div class="stat-info">
+                <span class="stat-value" style="font-size: 1.75rem;">{{ stats.appointments_today }}</span>
+                <span class="stat-label">Atendimentos Hoje</span>
+            </div>
+        </div>
+        <a href="{{ url_for('patients.pending_treatments') }}"
+            style="text-decoration: none; color: inherit; display: block;">
+            <div class="stat-card"
+                style="border-bottom: 4px solid hsl(var(--danger) / 0.6); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-sm)';">
+                <div class="stat-icon" style="background: hsl(var(--danger) / 0.1);">📝</div>
+                <div class="stat-info">
+                    <span class="stat-value" style="font-size: 1.75rem;">{{ stats.pending_treatments }}</span>
+                    <span class="stat-label">Planos Pendentes</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="dashboard-actions-grid">
+
+        <!-- Coluna esquerda: Ações rápidas + Alertas -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Ações Rápidas -->
+            <div class="card" style="background: white; border: 1px solid hsl(var(--border)); margin-bottom: 0;">
+                <h2 class="section-header">
+                    <span style="font-size: 1.4rem;">⚡</span> Ações Rápidas
+                </h2>
+                <div style="display: flex; gap: 1rem; flex-direction: column;">
+                    <a href="{{ url_for('patients.register') }}" class="btn btn-primary"
+                        style="justify-content: center; padding: 1.1rem;">
+                        ➕ Novo Cadastro de Paciente
+                    </a>
+                    <a href="{{ url_for('patients.list_patients') }}" class="btn btn-outline"
+                        style="justify-content: center; padding: 1.1rem; background: white;">
+                        🔍 Consultar Prontuários
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card de Alertas Operacionais -->
+            <div class="card" style="margin-bottom: 0; border: 1px solid hsl(var(--border));">
+                <h2 class="section-header">
+                    <span style="font-size: 1.4rem;">🔔</span> Alertas Operacionais
+                </h2>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+
+                    <!-- Assinaturas pendentes -->
+                    {% if stats.pending_signatures > 0 %}
+                    <div style="display: flex; align-items: center; justify-content: space-between;
+                                padding: 0.9rem 1rem; border-radius: var(--radius-md);
+                                background: hsl(var(--warning) / 0.1); border-left: 4px solid hsl(var(--warning));">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <span style="font-size: 1.2rem;">✍️</span>
+                            <span style="font-size: 0.9rem; font-weight: 600; color: hsl(var(--text-main));">
+                                {{ stats.pending_signatures }} evolução(ões) sem assinatura do professor
+                            </span>
+                        </div>
+                        <a href="{{ url_for('patients.list_patients') }}"
+                            style="font-size: 0.8rem; color: hsl(var(--primary)); font-weight: 700; text-decoration: none; white-space: nowrap;">
+                            Ver →
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Tratamentos pendentes -->
+                    {% if stats.pending_treatments > 0 %}
+                    <div style="display: flex; align-items: center; justify-content: space-between;
+                                padding: 0.9rem 1rem; border-radius: var(--radius-md);
+                                background: hsl(var(--danger) / 0.07); border-left: 4px solid hsl(var(--danger) / 0.6);">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <span style="font-size: 1.2rem;">📋</span>
+                            <span style="font-size: 0.9rem; font-weight: 600; color: hsl(var(--text-main));">
+                                {{ stats.pending_treatments }} procedimento(s) aguardando execução
+                            </span>
+                        </div>
+                        <a href="{{ url_for('patients.pending_treatments') }}"
+                            style="font-size: 0.8rem; color: hsl(var(--primary)); font-weight: 700; text-decoration: none; white-space: nowrap;">
+                            Ver →
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if stats.pending_signatures == 0 and stats.pending_treatments == 0 %}
+                    <div style="text-align: center; padding: 1.5rem; color: hsl(var(--text-muted)); font-size: 0.9rem;">
+                        ✅ Nenhum alerta no momento. Tudo em dia!
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna direita: Últimos Pacientes -->
+        <div class="card" style="margin-bottom: 0; border: 1px solid hsl(var(--border));">
+            <h2 class="section-header">
+                <span style="font-size: 1.4rem;">🕐</span> Últimos Pacientes Cadastrados
+            </h2>
+
+            {% if recent_patients %}
+            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                {% for p in recent_patients %}
+                <a href="{{ url_for('patients.view_patient', id=p.id) }}"
+                    style="text-decoration: none; display: flex; align-items: center; justify-content: space-between;
+                           padding: 0.85rem 1rem; border-radius: var(--radius-md);
+                           border: 1px solid hsl(var(--border)); background: hsl(var(--bg-main));
+                           transition: border-color 0.2s, background 0.2s;"
+                    onmouseover="this.style.borderColor='hsl(var(--primary))'; this.style.background='hsl(var(--primary-soft))';"
+                    onmouseout="this.style.borderColor='hsl(var(--border))'; this.style.background='hsl(var(--bg-main))';">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--primary-soft));
+                                    display: flex; align-items: center; justify-content: center;
+                                    font-weight: 700; font-size: 0.9rem; color: hsl(var(--primary)); flex-shrink: 0;">
+                            {{ p.nome[0]|upper }}
+                        </div>
+                        <span style="font-weight: 600; font-size: 0.95rem; color: hsl(var(--text-main));">{{ p.nome }}</span>
+                    </div>
+                    <span style="font-size: 0.78rem; color: hsl(var(--text-muted)); white-space: nowrap;">
+                        {% if p.criado_em %}
+                            {{ (p.criado_em|string)[:10] }}
+                        {% endif %}
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+            <div style="margin-top: 1.25rem; text-align: center;">
+                <a href="{{ url_for('patients.list_patients') }}"
+                    style="font-size: 0.875rem; color: hsl(var(--primary)); font-weight: 600; text-decoration: none;">
+                    Ver todos os pacientes →
+                </a>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: hsl(var(--text-muted));">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">👥</div>
+                <p>Nenhum paciente cadastrado ainda.</p>
+                <a href="{{ url_for('patients.register') }}" class="btn btn-primary" style="margin-top: 1rem;">
+                    Cadastrar primeiro paciente
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

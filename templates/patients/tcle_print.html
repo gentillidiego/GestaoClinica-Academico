@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Termo de Consentimento - {{ patient.nome }}{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        body {
+            background: white !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar,
+        .top-nav,
+        .btn,
+        .flash,
+        .print-btn {
+            display: none !important;
+        }
+
+        .main-wrapper {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        .content-area {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .print-container {
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        @page {
+            margin: 2cm;
+        }
+    }
+</style>
+
+<div class="animate-fade print-container"
+    style="max-width: 900px; margin: 2rem auto; padding: 3rem; background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid hsl(var(--border)); position: relative;">
+
+    <button onclick="window.print()" class="btn btn-primary print-btn"
+        style="position: absolute; top: 1rem; right: 1rem; font-weight: 700;">
+        🖨️ Imprimir
+    </button>
+    <a href="{{ url_for('patients.view_patient', id=patient.id) }}" class="btn btn-outline print-btn"
+        style="position: absolute; top: 1rem; left: 1rem; border-color: #cbd5e1; color: #475569;">
+        ⬅️ Voltar
+    </a>
+
+    <div style="text-align: center; margin-top: 2rem; margin-bottom: 3rem;">
+        <h2
+            style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: hsl(var(--primary)); text-transform: uppercase; margin-bottom: 0.5rem;">
+            TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO</h2>
+        <p style="color: hsl(var(--text-muted)); font-weight: 600;">CENTRO UNIVERSITÁRIO MARIO PONTES - FAPEC</p>
+    </div>
+
+    <div
+        style="line-height: 1.8; color: hsl(var(--text-main)); font-size: 1.1rem; text-align: justify; margin-bottom: 3rem;">
+        <p>
+            Declaro que o (a) aluno do curso de odontologia da Faculdade de Tecnologia de Alagoas
+            <strong style="border-bottom: 1px solid hsl(var(--border)); padding: 0 10px;">{{
+                tcle.full_name or tcle.username|capitalize }}</strong>
+            esclareceu-me adequadamente os propósitos, riscos, custos e alternativas de tratamento, bem como que o
+            sucesso do tratamento dependerá da resposta biológica do meu organismo à técnica empregada e de minha
+            colaboração, atendimento às prescrições, encaminhamentos e demais solicitações do profissional.
+        </p>
+        <p>
+            Declaro, ainda, que estou ciente que eventuais ausências às consultas e o não atendimento das
+            orientações profissionais prejudicarão o resultado pretendido, uma vez que a Odontologia não se trata de
+            uma ciência exata, sofrendo limitações.
+        </p>
+        <p>
+            Informo que, estou ciente de que, no curso do tratamento, dependendo da resposta biológica, poderá haver
+            a necessidade de alteração do plano de tratamento, da técnica empregada, que e da previsão orçamentária.
+        </p>
+        <p>
+            Por fim, aceito e autorizo a execução do tratamento comprometendo-me a cumprir as orientações do
+            profissional e arcando com os custos estipulados no orçamento apresentado.
+        </p>
+    </div>
+
+    <div style="margin-bottom: 3rem; font-weight: 600;">
+        Maceió, {{ (tcle.data_assinatura|string)[:10].split('-')[2] }} de
+        {% set months = ['Jan','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'] %}
+        {{ months[(tcle.data_assinatura|string)[:10].split('-')[1]|int] }} de
+        {{ (tcle.data_assinatura|string)[:4] }}
+    </div>
+
+    <div style="display: grid; gap: 2rem; margin-bottom: 3rem;">
+        <div class="signature-section" style="text-align: center;">
+            <label
+                style="display: block; font-weight: 700; color: hsl(var(--primary)); margin-bottom: 1rem; text-transform: uppercase; font-size: 0.85rem;">Assinatura
+                do Paciente (ou Responsável)</label>
+            <div
+                style="border-bottom: 1px solid hsl(var(--text-main)); width: 80%; margin: 0 auto; display: flex; justify-content: center;">
+                <img src="{{ tcle.assinatura_base64 }}" alt="Assinatura do Paciente"
+                    style="max-height: 120px; max-width: 100%;">
+            </div>
+            <p style="font-size: 0.95rem; font-weight: 600; margin-top: 0.5rem; color: hsl(var(--text-main));">{{
+                patient.nome }}</p>
+        </div>
+
+        <div style="padding-top: 1rem; border-top: 1px solid hsl(var(--border)); margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div style="text-align: center; flex: 1;">
+                    <span style="font-size: 0.85rem; font-weight: 700; color: hsl(var(--text-muted));">Termo Registrado
+                        pelo Aluno: {{ tcle.full_name or tcle.username|capitalize }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
