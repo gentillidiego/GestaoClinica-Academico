@@ -6,10 +6,15 @@
             Assinatura do Professor</h3>
         <form id="signForm" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div style="margin-bottom: 1.5rem;">
-                <label class="form-label" style="font-size: 0.9rem;">Matrícula (Docente)</label>
-                <input type="text" name="matricula" class="form-control" placeholder="Digite sua matrícula..."
+            <div style="margin-bottom: 1rem;">
+                <label class="form-label" style="font-size: 0.9rem;">Login (Usuário)</label>
+                <input type="text" name="prof_username" class="form-control" placeholder="Digite seu usuário..."
                     required autofocus>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label class="form-label" style="font-size: 0.9rem;">Senha</label>
+                <input type="password" name="prof_password" class="form-control" placeholder="Sua senha..."
+                    required>
             </div>
             <div style="display: flex; gap: 1rem;">
                 <button type="button" class="btn btn-outline" style="flex: 1;"
@@ -27,12 +32,16 @@
             style="font-family: var(--font-heading); color: hsl(var(--primary)); margin-bottom: 1.5rem; text-align: center;">
             Assinatura do Aluno</h3>
         <p style="text-align: center; font-size: 0.85rem; color: hsl(var(--text-muted)); margin-bottom: 1.5rem;">
-            Confirme sua matrícula para registrar-se como o <strong>aluno executor</strong> deste atendimento.</p>
+            Confirme seu login e senha para registrar-se como o <strong>aluno executor</strong> deste atendimento.</p>
         <form id="studentSignForm" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div style="margin-bottom: 1rem;">
+                <label class="form-label">Login (Usuário)</label>
+                <input type="text" name="student_username" class="form-control" placeholder="Seu usuário..." required autofocus>
+            </div>
             <div style="margin-bottom: 1.5rem;">
-                <label class="form-label">Matrícula</label>
-                <input type="text" name="matricula" class="form-control" placeholder="Sua matrícula..." required>
+                <label class="form-label">Senha</label>
+                <input type="password" name="student_password" class="form-control" placeholder="Sua senha..." required>
             </div>
             <div style="display: flex; gap: 1rem;">
                 <button type="button" class="btn btn-outline" style="flex: 1;"

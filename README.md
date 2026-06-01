@@ -36,6 +36,17 @@ A stack atual roda com:
    - O `celery-worker` agora inicializa por `scripts/start_celery.sh`, prepara `pdf_temp`, configura cache gravável para fontes e executa o Celery como `appuser`, evitando worker privilegiado como `root`.
    - `docker-compose.yml` possui healthchecks para Redis/PostgreSQL e removeu os mounts legados de `clinica.db` nos serviços web/worker.
 
+4. **Integração: Plano de Tratamento e Evolução Clínica:**
+   - Implementado fluxo automático onde procedimentos assinados/aprovados pelo professor na aba de Tratamento são instantaneamente enviados para a aba de Atendimento (Evolução Clínica) com status Pendente.
+   - O campo de data que gerava conflitos de formatação nula (`''`) no PostgreSQL foi atualizado para utilizar nativamente a função `NOW()`. A assinatura do professor na evolução só é exigida após a execução real pelo aluno.
+
+5. **Ferramentas Práticas e Povoamento Mock:**
+   - Adicionado o executável `scripts/populate_demo_data.py`, permitindo injetar rapidamente 15 perfis simulados completos no PostgreSQL (diabéticos com cálculo AAP 2018, hipertensos, infantis e idosos) com evoluções pré-preenchidas para demonstrações ricas.
+   - Adicionada documentação moderna executiva de TI (`docs/Apresentacao_TI_UMJ.html`) para facilitar pitch técnico de escalabilidade e segurança na infraestrutura universitária.
+
+6. **Segurança na Validação de Procedimentos:**
+   - O processo de assinatura/validação nos Planos de Tratamento e Evolução Clínica foi atualizado nos modais de front-end para exigir estritamente o conjunto de Login (Usuário) e Senha do Professor ou Aluno Executor, substituindo a antiga validação isolada por matrícula. Isso se alinha com as atualizações do back-end para um controle de auditoria seguro.
+
 ## 🦸 Instruções Ouro para Desenvolvedores e IAs (Agente Antigravity / Eng. de Sistema)
 
 Você, como próximo dev, mantenedor ou IA, deve assumir este repositório aplicando estas métricas mandatórias:
