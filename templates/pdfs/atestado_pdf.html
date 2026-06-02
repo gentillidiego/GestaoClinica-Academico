@@ -3,44 +3,61 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Atestado Odontológico - {{ patient.nome }}</title>
+    <title>Atestado - {{ patient.nome }}</title>
     <style>
         @page {
             size: A4;
-            margin: 20mm 20mm 25mm 20mm;
+            margin: 20mm 20mm 30mm 20mm;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #000;
             line-height: 1.8;
             margin: 0;
             padding: 0;
-            font-size: 14pt;
+            font-size: 12pt;
         }
 
         .header {
             text-align: center;
-            border-bottom: 2px solid #0056b3;
-            padding-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 12px;
             margin-bottom: 40px;
         }
 
         .header h1 {
-            color: #0056b3;
-            margin: 0 0 5px 0;
-            font-size: 24pt;
+            color: #000;
+            margin: 0 0 4px 0;
+            font-size: 22pt;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
         .header p {
             margin: 0;
-            color: #666;
-            font-size: 12pt;
+            color: #333;
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .content {
             text-align: justify;
-            min-height: 400px;
+            min-height: 380px;
+        }
+
+        .content p {
+            margin-bottom: 14px;
+        }
+
+        .date {
+            text-align: right;
+            margin-top: 50px;
+            margin-bottom: 60px;
+            font-size: 12pt;
         }
 
         .footer {
@@ -48,71 +65,129 @@
             bottom: 0;
             left: 0;
             right: 0;
+            padding: 0 20mm 10mm 20mm;
+        }
+
+        .signature-box {
             text-align: center;
-            padding-top: 20px;
+            width: 350px;
+            margin: 0 auto 20px auto;
         }
 
         .signature-line {
-            width: 300px;
-            border-top: 1px solid #333;
-            margin: 0 auto;
-            margin-bottom: 10px;
+            border-top: 1px solid #000;
+            margin-bottom: 6px;
+            margin-top: 60px;
         }
 
-        .date {
-            text-align: right;
-            margin-top: 60px;
-            margin-bottom: 80px;
-            font-size: 13pt;
+        .signature-label {
+            font-size: 10pt;
+            color: #333;
+        }
+
+        .address-table {
+            width: 100%;
+            border-top: 1px solid #000;
+            padding-top: 8px;
+            font-size: 8.5pt;
+            color: #444;
+            line-height: 1.4;
+        }
+
+        .address-table td {
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .address-table td:first-child {
+            padding-right: 15px;
+        }
+
+        .address-table td:last-child {
+            padding-left: 15px;
         }
     </style>
 </head>
 
 <body>
+    <!-- CABEÇALHO -->
     <div class="header">
-        <h1>ATESTADO ODONTOLÓGICO</h1>
-        <p>Clínica Odontológica Gestão Clínica</p>
+        <h1>Atestado</h1>
+        <p>Clínica Odontologia &mdash; UMJ</p>
     </div>
 
+    <!-- CORPO -->
     <div class="content">
         <p>
-            Atesto para os devidos fins que o(a) paciente <strong>{{ patient.nome }}</strong>
-            {% if patient.rg %}, portador(a) do RG n° {{ patient.rg }}{% endif %}
-            {% if patient.cpf %}, e CPF n° {{ patient.cpf }}{% endif %},
-            esteve sob meus cuidados profissionais na data de hoje,
-            sendo submetido(a) a {{ doc.motivo|lower }}.
+            Atestamos para os devidos fins que o(a) paciente <strong>{{ patient.nome }}</strong>{% if patient.rg %},
+            portador(a) do RG n° {{ patient.rg }}{% endif %}{% if patient.cpf %}, e CPF n° {{ patient.cpf }}{% endif %},
+            esteve sob atendimento odontológico nesta Clínica Escola na data de
+            <strong>{{ (doc.data|string).split(' ')[0] if doc.data else 'hoje' }}</strong>,
+            tendo sido submetido(a) a {{ doc.motivo|lower }}.
         </p>
 
         {% if doc.dias_repouso and doc.dias_repouso > 0 %}
         <p>
-            Por motivo de ordem estritamente odontológica, necessita de
-            <strong>{{ doc.dias_repouso }} dia(s)</strong> de repouso para sua recuperação.
+            Por necessidade clínica de ordem odontológica, o(a) referido(a) paciente necessita de
+            afastamento de suas atividades pelo período de
+            <strong>{{ doc.dias_repouso }} ({{ doc.dias_repouso|int |string }})</strong>
+            dia(s), contados a partir da data acima.
         </p>
         {% endif %}
 
         {% if doc.observacao %}
         <p>
-            <strong>Observações adicionais:</strong><br>
+            <strong>Observações:</strong><br>
             {{ doc.observacao }}
         </p>
         {% endif %}
 
         {% if doc.cid %}
         <p>
-            <strong>CID-10:</strong> {{ doc.cid }} (Anotação autorizada pelo paciente).
+            <strong>CID-10:</strong> {{ doc.cid }}
+            (informação prestada mediante autorização expressa do(a) paciente, nos termos do
+            Código de Ética Odontológica — CFO, Resolução 118/2012).
         </p>
         {% endif %}
+
+        <p>
+            Este atestado é válido somente para os fins que se destina e não substitui
+            qualquer outro documento médico ou jurídico pertinente.
+        </p>
     </div>
 
+    <!-- DATA -->
     <div class="date">
-        Data: {{ (doc.data|string).split(' ')[0] if doc.data else '' }}
+        Maceió, {{ (doc.data|string).split('-')[2][:2] if doc.data else '' }} de
+        {% set meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+                        'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'] %}
+        {% if doc.data %}
+            {{ meses[(doc.data|string).split('-')[1]|int - 1] }}
+        {% endif %}
+        de {{ (doc.data|string).split('-')[0] if doc.data else '' }}.
     </div>
 
+    <!-- ASSINATURA E RODAPÉ -->
     <div class="footer">
-        <div class="signature-line"></div>
-        <strong>{{ prof.username }}</strong><br>
-        AC Odontologia<br>
-        {% if prof.cro %}CRO: {{ prof.cro }}{% endif %}
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <div class="signature-label">Assinatura e Carimbo do Responsável</div>
+        </div>
+
+        <table class="address-table">
+            <tr>
+                <td>
+                    <strong>Unidade I</strong><br>
+                    Av. Presidente Roosevelt, 1200 - Serraria<br>
+                    Maceió-AL &bull; (82) 3338-7000
+                </td>
+                <td>
+                    <strong>Unidade II</strong><br>
+                    Av. Antônio Lisboa de Amorim, 220 - Antares<br>
+                    Maceió-AL &bull; (82) 3311-5645
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 

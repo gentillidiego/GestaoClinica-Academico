@@ -68,7 +68,17 @@
                     <tr style="border-bottom: 1px solid hsl(var(--border));">
                         <td style="padding: 1rem; white-space: nowrap;">{{ (appt.data|string).split(' ')[0] if appt.data
                             else '' }}</td>
-                        <td style="padding: 1rem;">{{ appt.observacoes }}</td>
+                        <td style="padding: 1rem;">
+                            <div class="inline-edit-obs-container" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; width: 100%;">
+                                <span class="obs-text" style="word-break: break-word;">{{ appt.observacoes }}</span>
+                                {% if appt.observacoes and appt.observacoes.startswith('[Executar]') and not appt.professor_nome %}
+                                <button class="btn-inline-edit" data-url="{{ url_for('patients.edit_atendimento', id=patient.id, appt_id=appt.id) }}" onclick="startInlineEdit(this)" 
+                                    style="background: transparent; border: none; cursor: pointer; padding: 2px 6px; font-size: 0.85rem; color: hsl(var(--primary)); opacity: 0.7; transition: opacity 0.2s;"
+                                    onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'"
+                                    title="Editar descrição">✏️</button>
+                                {% endif %}
+                            </div>
+                        </td>
                         <td style="padding: 1rem; text-align: center;">
                             {% if appt.aluno_executor_nome %}
                             <span

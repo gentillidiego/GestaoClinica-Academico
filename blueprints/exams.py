@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required
-from database import execute, query
+from database import execute, execute_returning, query, execute_transaction
+from werkzeug.security import check_password_hash
 import json
 import re
 
@@ -97,7 +98,7 @@ def fisico(anamnesis_id, exam_id=None):
             flash('Exame Físico atualizado com sucesso!', 'success')
         else:
             # Criar novo
-            new_exam_id = execute("INSERT INTO exams (anamnesis_id, patient_id, tipo) VALUES (%s, %s, %s)", 
+            new_exam_id = execute_returning("INSERT INTO exams (anamnesis_id, patient_id, tipo) VALUES (%s, %s, %s)", 
                              (anamnesis_id, anamnesis['patient_id'], 'fisico'))
             
             execute("""
@@ -146,7 +147,7 @@ def odontograma(anamnesis_id, exam_id=None):
             flash('Odontograma atualizado com sucesso!', 'success')
         else:
             # Criar novo
-            new_exam_id = execute("INSERT INTO exams (anamnesis_id, patient_id, tipo) VALUES (%s, %s, %s)", 
+            new_exam_id = execute_returning("INSERT INTO exams (anamnesis_id, patient_id, tipo) VALUES (%s, %s, %s)", 
                              (anamnesis_id, anamnesis['patient_id'], 'odontograma'))
             
             execute("INSERT INTO exam_odontograma (exam_id, dentes_data, notas_dentes, observacoes) VALUES (%s, %s, %s, %s)", 
@@ -188,7 +189,7 @@ def controle_placa(anamnesis_id, exam_id=None):
             """, (data_faces, num_dentes, num_faces_placa, indice_placa, psr_data, condicao_periodontal, exam_id))
             flash('Controle de Placa atualizado!', 'success')
         else:
-            new_exam_id = execute("INSERT INTO exams (anamnesis_id, patient_id, tipo) VALUES (%s, %s, %s)", 
+            new_exam_id = execute_returning("INSERT INTO exams (anamnesis_id, patient_id, tipo) VALUES (%s, %s, %s)", 
                              (anamnesis_id, anamnesis['patient_id'], 'controle_placa'))
             execute("""
                 INSERT INTO exam_controle_placa (
@@ -250,7 +251,7 @@ def periograma(anamnesis_id, exam_id=None):
                    (fase, medicoes_data, diagnostico, exam_id))
             flash('Periograma atualizado!', 'success')
         else:
-            new_exam_id = execute("INSERT INTO exams (anamnesis_id, patient_id, tipo) VALUES (%s, %s, %s)", 
+            new_exam_id = execute_returning("INSERT INTO exams (anamnesis_id, patient_id, tipo) VALUES (%s, %s, %s)", 
                              (anamnesis_id, anamnesis['patient_id'], 'periograma'))
             execute("INSERT INTO exam_periograma (exam_id, fase, medicoes_data, diagnostico) VALUES (%s, %s, %s, %s)", 
                    (new_exam_id, fase, medicoes_data, diagnostico))
@@ -264,3 +265,45 @@ def periograma(anamnesis_id, exam_id=None):
 @login_required
 def imagem(anamnesis_id):
     return "Módulo de Exame de Imagem - Em breve."
+
+@exams_bp.route('/delete/<int:patient_id>/<int:exam_id>', methods=['POST'])
+@login_required
+def delete_exam(patient_id, exam_id):
+    username = request.form.get('prof_username')
+    password = request.form.get('prof_password')
+    tipo = request.form.get('tipo')
+    
+    # 1. Fetch user credentials
+    user = query("SELECT id, password, role FROM users WHERE username = %s", (username,), one=True)
+    if not user or not check_password_hash(user['password'], password):
+        flash('Credenciais inválidas.', 'danger')
+        return redirect(url_for('patients.view_patient', id=patient_id) + '#tab-exames')
+        
+    # 2. Check if user is admin or professor
+    if user['role'] not in ['admin', 'professor']:
+        flash('Apenas Administradores ou Professores podem excluir exames.', 'danger')
+        return redirect(url_for('patients.view_patient', id=patient_id) + '#tab-exames')
+        
+    # 3. Perform deletion inside transaction
+    try:
+        child_table = None
+        if tipo == 'fisico':
+            child_table = 'exam_fisico'
+        elif tipo == 'odontograma':
+            child_table = 'exam_odontograma'
+        elif tipo == 'controle_placa':
+            child_table = 'exam_controle_placa'
+        elif tipo == 'periograma':
+            child_table = 'exam_periograma'
+            
+        queries = []
+        if child_table:
+            queries.append((f"DELETE FROM {child_table} WHERE exam_id = %s", (exam_id,)))
+        queries.append(("DELETE FROM exams WHERE id = %s", (exam_id,)))
+        
+        execute_transaction(queries)
+        flash('Exame excluído com sucesso.', 'success')
+    except Exception as e:
+        flash(f'Erro ao excluir exame: {str(e)}', 'danger')
+        
+    return redirect(url_for('patients.view_patient', id=patient_id) + '#tab-exames')

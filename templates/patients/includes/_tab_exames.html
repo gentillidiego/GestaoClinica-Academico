@@ -67,6 +67,18 @@
                     </button>
                     {% endif %}
                 </div>
+
+                <!-- Exclusão do Exame (Admin/Professor) -->
+                {% if current_user.role in ['admin', 'professor'] %}
+                <div style="margin-top: 0.8rem;">
+                    <button
+                        onclick="openDeleteExamModal('{{ url_for('exams.delete_exam', patient_id=patient.id, exam_id=exam.id) }}', '{{ exam.tipo }}')"
+                        class="btn btn-outline"
+                        style="width: 100%; justify-content: center; color: hsl(var(--danger)); border-color: hsl(var(--danger)); font-weight: 700; padding: 0.5rem; font-size: 0.85rem; gap: 0.5rem;">
+                        🗑️ Excluir Exame
+                    </button>
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
             {% else %}

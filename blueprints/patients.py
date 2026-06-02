@@ -348,14 +348,13 @@ def sign_treatment(id, proc_id):
         
         # Busca o procedimento para pegar os detalhes
         proc = query("SELECT dente, descricao FROM tratamento_procedimentos WHERE id = %s", (proc_id,), one=True)
-        obs = f"Dente {proc['dente']}: {proc['descricao']}" if proc['dente'] else proc['descricao']
+        obs = f"[Executar] Procedimento Autorizado - Dente {proc['dente']}: {proc['descricao']}" if proc['dente'] else f"[Executar] Procedimento Autorizado: {proc['descricao']}"
         
         # Importa automaticamente para a aba Atendimento (Evolução)
-        # Data fica em branco até que paciente também assine
         execute('''
-            INSERT INTO atendimentos (patient_id, data, observacoes, created_by, professor_id, status)
-            VALUES (%s, '', %s, %s, %s, 'Concluido')
-        ''', (id, obs, current_user.id, prof['id']))
+            INSERT INTO atendimentos (patient_id, data, observacoes, created_by, status)
+            VALUES (%s, NOW(), %s, %s, 'Pendente')
+        ''', (id, obs, current_user.id))
         
         flash('Procedimento assinado e importado para evolução!', 'success')
     except Exception as e:
@@ -451,14 +450,23 @@ def sign_student_atendimento(id, appt_id):
 def edit_atendimento(id, appt_id):
     data_sessao = request.form.get('data')
     observacoes = request.form.get('observacoes')
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     if not all([data_sessao, observacoes]):
+        if is_ajax:
+            from flask import jsonify
+            return jsonify({'success': False, 'error': 'Data e observações são obrigatórias.'}), 400
         flash('Data e observações são obrigatórias.', 'danger')
         return redirect(url_for('patients.view_patient', id=id) + '#tab-atendimento')
         
     # Check permission
-    appt = query("SELECT created_by, professor_id FROM atendimentos WHERE id = %s", (appt_id,), one=True)
-    if not appt or (current_user.id != appt['created_by'] and current_user.id != appt['professor_id'] and not current_user.is_admin):
+    appt = query("SELECT created_by, professor_id, observacoes FROM atendimentos WHERE id = %s", (appt_id,), one=True)
+    is_executar = appt and appt['observacoes'] and appt['observacoes'].startswith('[Executar]')
+    
+    if not appt or (current_user.id != appt['created_by'] and current_user.id != appt['professor_id'] and not current_user.is_admin and not is_executar):
+        if is_ajax:
+            from flask import jsonify
+            return jsonify({'success': False, 'error': 'Sem permissão para editar este atendimento.'}), 403
         flash('Sem permissão para editar este atendimento.', 'danger')
         return redirect(url_for('patients.view_patient', id=id) + '#tab-atendimento')
         
@@ -468,8 +476,14 @@ def edit_atendimento(id, appt_id):
             SET data = %s, observacoes = %s
             WHERE id = %s AND patient_id = %s
         ''', (data_sessao, observacoes, appt_id, id))
+        if is_ajax:
+            from flask import jsonify
+            return jsonify({'success': True}), 200
         flash('Evolução clínica atualizada com sucesso!', 'success')
     except Exception as e:
+        if is_ajax:
+            from flask import jsonify
+            return jsonify({'success': False, 'error': str(e)}), 500
         flash(f'Erro ao atualizar evolução: {str(e)}', 'danger')
         
     return redirect(url_for('patients.view_patient', id=id) + '#tab-atendimento')

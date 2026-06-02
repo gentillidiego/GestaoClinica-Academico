@@ -47,6 +47,24 @@ A stack atual roda com:
 6. **Segurança na Validação de Procedimentos:**
    - O processo de assinatura/validação nos Planos de Tratamento e Evolução Clínica foi atualizado nos modais de front-end para exigir estritamente o conjunto de Login (Usuário) e Senha do Professor ou Aluno Executor, substituindo a antiga validação isolada por matrícula. Isso se alinha com as atualizações do back-end para um controle de auditoria seguro.
 
+7. **Exclusão de Exames por Administrador/Professor:**
+   - Administradores e professores agora dispõem de um botão **Excluir 🗑️** em cada card de exame (Físico, Odontograma, Periograma, Controle de Placa, Anamnese, Evolução Clínica), com confirmação por senha antes de remover o registro.
+
+8. **Edição Inline da Evolução Clínica (Procedimentos Automáticos):**
+   - Procedimentos gerados automaticamente pelo plano de tratamento (prefixo `[Executar]`) agora exibem um ícone de lápis ✏️ ao lado da descrição na aba de Evolução Clínica.
+   - O aluno executor pode clicar no ícone, editar o texto diretamente (ex: remover um dente que não foi atendido), e a alteração é salva automaticamente via AJAX ao clicar fora ou pressionar Enter — sem recarregar a página.
+   - **Regras de negócio:**
+     - O lápis só aparece em registros `[Executar]` **ainda não assinados pelo professor**. Após a assinatura do professor, a edição fica bloqueada.
+     - O backend detecta requisições AJAX e retorna JSON (`200 / 403 / 500`) em vez de redirect, garantindo feedback correto para o cliente.
+     - A URL da requisição é gerada pelo Jinja2 via `url_for`, garantindo compatibilidade com o prefixo de proxy reverso `/GestaoClinica/`.
+
+9. **Atestado Odontológico — Reformulação:**
+   - Cabeçalho simplificado: **ATESTADO** / *Clínica Odontologia — UMJ*.
+   - Corpo do texto revisado conforme as normas do CFO (Resolução 118/2012): identificação do paciente, período de afastamento por extenso, CID-10 com cláusula de autorização expressa, cláusula de validade do documento.
+   - Data formatada por extenso (ex: "Maceió, 02 de junho de 2026").
+   - Assinatura em branco ("Assinatura e Carimbo do Responsável") — para ser preenchida manualmente pelo professor.
+   - Rodapé com os endereços oficiais das duas unidades da UMJ (Unidade I: Serraria / Unidade II: Antares).
+
 ## 🦸 Instruções Ouro para Desenvolvedores e IAs (Agente Antigravity / Eng. de Sistema)
 
 Você, como próximo dev, mantenedor ou IA, deve assumir este repositório aplicando estas métricas mandatórias:

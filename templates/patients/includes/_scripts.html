@@ -229,6 +229,50 @@
         modal.style.display = 'flex';
     }
 
+    function openDeleteExamModal(actionUrl, tipo) {
+        const modal = document.getElementById('signModal');
+        const form = document.getElementById('signForm');
+        form.action = actionUrl;
+
+        // Adiciona input hidden para 'tipo' se não existir
+        let tipoInput = form.querySelector('input[name="tipo"]');
+        if (!tipoInput) {
+            tipoInput = document.createElement('input');
+            tipoInput.type = 'hidden';
+            tipoInput.name = 'tipo';
+            form.appendChild(tipoInput);
+        }
+        tipoInput.value = tipo;
+
+        const title = modal.querySelector('h3');
+        const originalTitleText = title.innerText;
+        const originalTitleColor = title.style.color;
+
+        title.innerText = 'Confirmar Exclusão de Exame (' + tipo.toUpperCase() + ')';
+        title.style.color = 'hsl(var(--danger))';
+
+        const sub = modal.querySelector('button[type="submit"]');
+        const originalSubText = sub.innerText;
+        const originalSubClass = sub.className;
+
+        sub.innerText = 'Excluir Permanentemente';
+        sub.className = 'btn btn-danger';
+
+        const originalClose = window.closeSignModal;
+        window.closeSignModal = function () {
+            title.innerText = originalTitleText;
+            title.style.color = originalTitleColor;
+            sub.innerText = originalSubText;
+            sub.className = originalSubClass;
+            // Remove o input hidden do tipo para não sujar outras submissões
+            if (tipoInput) tipoInput.remove();
+            originalClose();
+            window.closeSignModal = originalClose;
+        };
+
+        modal.style.display = 'flex';
+    }
+
     function switchSubTab(evt, subtabName) {
         var i, subtabcontent, subtablinks;
         subtabcontent = document.getElementsByClassName("subtab-content");
@@ -469,5 +513,108 @@
     function closeNovoAtestadoModal() {
         document.getElementById('novoAtestadoModal').style.display = 'none';
         document.getElementById('novoAtestadoForm').reset();
+    }
+
+    let isSaving = false;
+    function startInlineEdit(button) {
+        if (isSaving) return;
+        
+        const container = button.closest('.inline-edit-obs-container');
+        const textSpan = container.querySelector('.obs-text');
+        const currentText = textSpan.innerText;
+        
+        const textarea = document.createElement('textarea');
+        textarea.value = currentText;
+        textarea.className = 'form-control';
+        textarea.style.width = '100%';
+        textarea.style.minHeight = '60px';
+        textarea.style.fontSize = '0.85rem';
+        textarea.style.padding = '0.4rem';
+        textarea.style.resize = 'vertical';
+        
+        textSpan.style.display = 'none';
+        button.style.display = 'none';
+        container.appendChild(textarea);
+        
+        textarea.focus();
+
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                textarea.blur();
+            }
+        });
+
+        textarea.addEventListener('blur', function() {
+            if (isSaving) return;
+            isSaving = true;
+
+            const newText = textarea.value.trim();
+
+            if (newText === '') {
+                alert('A descrição não pode ficar vazia.');
+                isSaving = false;
+                textarea.focus();
+                return;
+            }
+
+            if (newText === currentText) {
+                textSpan.style.display = '';
+                button.style.display = '';
+                textarea.remove();
+                isSaving = false;
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('observacoes', newText);
+            
+            const tr = container.closest('tr');
+            const editBtn = tr.querySelector('button[title="Editar"]');
+            const dataSessao = editBtn ? editBtn.getAttribute('data-date') : new Date().toISOString().split('T')[0];
+            formData.append('data', dataSessao);
+            
+            const csrfInput = document.querySelector('input[name="csrf_token"]');
+            if (csrfInput) {
+                formData.append('csrf_token', csrfInput.value);
+            }
+
+            const editUrl = button.getAttribute('data-url');
+
+            fetch(editUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    textSpan.innerText = newText;
+                    if (editBtn) {
+                        editBtn.setAttribute('data-obs', newText);
+                    }
+                    textSpan.style.display = '';
+                    button.style.display = '';
+                    textarea.remove();
+                } else {
+                    alert('Erro ao salvar as alterações.');
+                    textSpan.style.display = '';
+                    button.style.display = '';
+                    textarea.remove();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro de conexão ao salvar.');
+                textSpan.style.display = '';
+                button.style.display = '';
+                textarea.remove();
+            });
+        });
+
+        textarea.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
     }
 </script>
