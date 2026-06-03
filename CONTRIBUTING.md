@@ -2,6 +2,17 @@
 
 Este repositório contém dados e fluxos clínicos sensíveis. Mudanças devem ser pequenas, revisáveis e acompanhadas de validação objetiva.
 
+## Responsável pelo Desenvolvimento
+
+Desenvolvimento por **Gentilli Pereira** - Analista e adm de sistemas, desenvolvedor de Software. Atua no desenvolvimento de aplicações web, arquitetura de sistemas e gerenciamento de infra Linux.
+
+- E-mail: `gentillidiego@gmail.com`
+- Telefone/WhatsApp: `(82) 98179-5886`
+
+## Licença e Uso
+
+Este projeto é proprietário. Qualquer uso, cópia, modificação, distribuição ou compartilhamento fora do escopo autorizado deve ser aprovado previamente por Gentilli Pereira. Consulte [LICENSE](LICENSE).
+
 ## Fluxo Recomendado
 
 1. Crie uma branch a partir de `main`.

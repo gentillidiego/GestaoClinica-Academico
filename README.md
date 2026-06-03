@@ -4,6 +4,17 @@ Sistema web para gestão de prontuários odontológicos em clínica-escola, com 
 
 O projeto usa Flask com renderização server-side, PostgreSQL como banco transacional, Redis para cache, sessões, filas e rate limiting, Celery para tarefas em background e Docker Compose para execução local ou em servidor.
 
+## Desenvolvimento e Responsável Técnico
+
+Desenvolvimento por **Gentilli Pereira** - Analista e adm de sistemas, desenvolvedor de Software. Atua no desenvolvimento de aplicações web, arquitetura de sistemas e gerenciamento de infra Linux.
+
+- E-mail: `gentillidiego@gmail.com`
+- Telefone/WhatsApp: `(82) 98179-5886`
+
+## Licença
+
+Este projeto é disponibilizado sob licença proprietária. O uso, cópia, modificação, distribuição ou transferência para terceiros exige autorização prévia e expressa de Gentilli Pereira. Consulte [LICENSE](LICENSE).
+
 ## Status do Projeto
 
 - Branch principal: `main`
@@ -181,3 +192,7 @@ Pontos de atenção:
 - PDFs gerados por WeasyPrint devem usar CSS simples e previsível para impressão.
 - Se um arquivo criado pelo Celery precisa ser servido pelo Flask, use volume compartilhado.
 - Mudanças em arquitetura, ambiente, deploy, segurança, banco, permissões, PDFs ou fluxos clínicos devem atualizar a documentação no mesmo ciclo.
+
+## Contato
+
+Para dúvidas técnicas, manutenção evolutiva ou autorização de uso do repositório, contate Gentilli Pereira pelo e-mail `gentillidiego@gmail.com` ou telefone/WhatsApp `(82) 98179-5886`.

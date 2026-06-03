@@ -6,6 +6,15 @@
 > **Meta:** 100+ usuários simultâneos estáveis
 > **Referência completa:** [plano_escalabilidade.md](./plano_escalabilidade.md)
 
+## Responsável pelo Desenvolvimento
+
+Desenvolvimento por **Gentilli Pereira** - Analista e adm de sistemas, desenvolvedor de Software. Atua no desenvolvimento de aplicações web, arquitetura de sistemas e gerenciamento de infra Linux.
+
+- E-mail: `gentillidiego@gmail.com`
+- Telefone/WhatsApp: `(82) 98179-5886`
+
+Este projeto é proprietário. Uso, cópia, modificação, distribuição ou transferência para terceiros dependem de autorização prévia e expressa de Gentilli Pereira.
+
 ---
 
 ## 📊 Status Geral

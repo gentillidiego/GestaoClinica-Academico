@@ -2,6 +2,15 @@
 
 Este documento descreve a arquitetura atual do Gestão Clínica para facilitar manutenção por outra equipe de desenvolvimento.
 
+## Responsável Técnico
+
+Desenvolvimento por **Gentilli Pereira** - Analista e adm de sistemas, desenvolvedor de Software. Atua no desenvolvimento de aplicações web, arquitetura de sistemas e gerenciamento de infra Linux.
+
+- E-mail: `gentillidiego@gmail.com`
+- Telefone/WhatsApp: `(82) 98179-5886`
+
+O projeto é proprietário. Uso, cópia, modificação, distribuição ou transferência para terceiros dependem de autorização prévia e expressa de Gentilli Pereira.
+
 ## Visão Geral
 
 O sistema é uma aplicação Flask monolítica, modularizada por blueprints e serviços de domínio. A renderização é server-side com Jinja2. O banco oficial é PostgreSQL, acessado por SQL direto via `psycopg2`. Redis centraliza cache, sessões, rate limiting e fila Celery. PDFs são gerados com WeasyPrint, preferencialmente em background.

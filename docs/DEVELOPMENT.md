@@ -2,6 +2,15 @@
 
 Este guia descreve o fluxo recomendado para desenvolvimento, validação e operação do Gestão Clínica.
 
+## Responsável pelo Desenvolvimento
+
+Desenvolvimento por **Gentilli Pereira** - Analista e adm de sistemas, desenvolvedor de Software. Atua no desenvolvimento de aplicações web, arquitetura de sistemas e gerenciamento de infra Linux.
+
+- E-mail: `gentillidiego@gmail.com`
+- Telefone/WhatsApp: `(82) 98179-5886`
+
+Este projeto é proprietário. Antes de compartilhar, copiar, modificar ou distribuir fora do escopo autorizado, solicite aprovação expressa de Gentilli Pereira.
+
 ## Ambiente
 
 1. Copie `.env.example` para `.env`.
