@@ -1,6 +1,6 @@
 # Nova Análise Geral do Sistema (Rev 3)
 
-> **Status histórico:** este relatório foi produzido antes da migração operacional para PostgreSQL/Redis/Celery. Use o [README.md](README.md) e [docs/system_architecture_and_rules.md](docs/system_architecture_and_rules.md) como fontes atuais de arquitetura. As menções a SQLite/`clinica.db` abaixo devem ser lidas como contexto legado.
+> **Status histórico:** este relatório foi produzido antes da migração operacional para PostgreSQL/Redis/Celery. Use o [README.md](README.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) e [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) como fontes atuais de arquitetura. As menções a SQLite/`clinica.db` abaixo devem ser lidas como contexto legado.
 
 Após a última rodada de implementações, realizei uma **auditoria profunda** em toda a base de código do sistema *Gestão Clínica*. Abaixo, consolido o que foi finalizado e os **novos pontos de atenção** identificados, com foco na estabilidade, segurança e manutenbilidade a longo prazo.
 

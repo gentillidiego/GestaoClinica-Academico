@@ -1,4 +1,7 @@
-# 📋 Plano de Escalabilidade — Gestão Clínica
+# Plano de Escalabilidade — Gestão Clínica
+
+> **Arquivo histórico.** Este plano registra a análise feita antes da migração para PostgreSQL, Redis e Celery. Para o estado atual do projeto, use [README.md](../README.md), [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) e [docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md).
+
 > **Objetivo:** Suportar 100+ usuários simultâneos com estabilidade, desempenho e sem perda de dados.
 > **Data de análise:** 2026-03-24
 

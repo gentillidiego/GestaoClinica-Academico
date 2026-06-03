@@ -1,4 +1,7 @@
-# 🚀 Progresso de Execução — Escalabilidade GestaoClinica
+# Progresso de Execução — Escalabilidade GestaoClinica
+
+> **Arquivo histórico.** Este documento registra o progresso das sprints de escalabilidade. Para onboarding e manutenção atual, use [README.md](../README.md), [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) e [docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md).
+
 > **Última atualização:** 2026-03-24
 > **Meta:** 100+ usuários simultâneos estáveis
 > **Referência completa:** [plano_escalabilidade.md](./plano_escalabilidade.md)
